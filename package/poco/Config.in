@@ -28,6 +28,7 @@ config BR2_PACKAGE_POCO_XML
 config BR2_PACKAGE_POCO_UTIL
 	bool "util"
 	select BR2_PACKAGE_POCO_XML
+	select BR2_PACKAGE_POCO_JSON
 
 config BR2_PACKAGE_POCO_NET
 	bool "net"

@@ -1,0 +1,33 @@
+--- a/Net/src/DNS.cpp	2019-03-06 18:13:44.796527793 +0300
++++ b/Net/src/DNS.cpp	2019-03-06 18:16:06.529638044 +0300
+@@ -25,6 +25,8 @@
+ #include <resolv.h>
+ #endif
+ 
++#include <resolv.h>
++ 
+ 
+ using Poco::Environment;
+ using Poco::NumberFormatter;
+@@ -64,6 +66,10 @@
+ 	}
+ 	else
+ 	{
++	  	if (EAI_AGAIN == rc)
++		{
++			res_init();
++		}
+ 		aierror(rc, hostname);
+ 	}
+ #elif defined(POCO_VXWORKS)
+@@ -113,6 +119,10 @@
+ 		}
+ 		else
+ 		{
++			if (EAI_AGAIN == rc)
++			{
++				res_init();
++			}
+ 			aierror(rc, address.toString());
+ 		}
+ 	}
