@@ -33,7 +33,7 @@ define BERKELEYDB_CONFIGURE_CMDS
 		--exec-prefix=/usr \
 		--sysconfdir=/etc \
 		--with-gnu-ld \
-		$(if $(BR2_INSTALL_LIBSTDCPP),--enable-cxx,--disable-cxx) \
+		$(if $(BR2_INSTALL_LIBSTDCPP),--enable-stl,--disable-stl) \
 		--disable-java \
 		--disable-tcl \
 		$(if $(BR2_PACKAGE_BERKELEYDB_COMPAT185),--enable-compat185,--disable-compat185) \
