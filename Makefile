@@ -612,7 +612,7 @@ sdk: prepare-sdk $(BR2_TAR_HOST_DEPENDENCY)
 		-C / $(patsubst /%,%,$(HOST_DIR))
 
 RSYNC_VCS_EXCLUSIONS = \
-	--exclude .svn --exclude .git --exclude .hg --exclude .bzr \
+	--exclude .svn --exclude .hg --exclude .bzr \
 	--exclude CVS
 
 # When stripping, obey to BR2_STRIP_EXCLUDE_DIRS and
