@@ -19,3 +19,4 @@ RAPIDJSON_CONF_OPTS = \
 	-DRAPIDJSON_BUILD_TESTS=OFF
 
 $(eval $(cmake-package))
+$(eval $(host-cmake-package))
