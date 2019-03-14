@@ -1,0 +1,14 @@
+  _____   _______        _           
+ |_   _| |__   __|      | |          
+   | |  ___ | | ___  ___| |__   __ _ 
+   | | / _ \\| |/ _ \\/ __| '_ \\ / _` |
+  _| || (_) | |  __/ (__| | | | (_| |
+ |_____\\___/|_|\\___|\\___|_| |_|\\__,_|
+                                     
+Last reboot completed at \d
+Operating system release : \s-\r
+Machine Architecture: \m
+Console: \l
+
+Welcome to \n
+
