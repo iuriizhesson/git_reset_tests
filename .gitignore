@@ -13,3 +13,4 @@
 *.rej
 *~
 *.pyc
+/board/streamplug/fs/lib/*
