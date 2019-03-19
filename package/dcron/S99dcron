@@ -3,6 +3,10 @@
 case "$1" in
 	start)
 		printf "Starting cron ... "
+		if [ ! -L /var/spool/cron/crontabs ]; then
+			mkdir -p /var/spool/cron
+			ln -s /etc/crontabs /var/spool/cron/crontabs
+		fi
 		start-stop-daemon -S -q -m -b -p /var/run/dcron.pid --exec /usr/sbin/crond -- -f
 		echo "done."
 		;;

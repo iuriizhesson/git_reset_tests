@@ -25,7 +25,7 @@ define DCRON_INSTALL_TARGET_CMDS
 endef
 
 define DCRON_INSTALL_INIT_SYSV
-	$(INSTALL) -D -m 0755 package/dcron/S90dcron $(TARGET_DIR)/etc/init.d/S90dcron
+	$(INSTALL) -D -m 0755 package/dcron/S99dcron $(TARGET_DIR)/etc/init.d/S99dcron
 endef
 
 define DCRON_INSTALL_INIT_SYSTEMD
