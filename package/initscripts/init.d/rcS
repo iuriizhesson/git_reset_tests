@@ -1,5 +1,6 @@
 #!/bin/sh
 
+. /etc/profile
 
 # Start all init scripts in /etc/init.d
 # executing them in numerical order.

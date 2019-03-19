@@ -1,5 +1,6 @@
 #!/bin/sh
 
+. /etc/profile
 
 # Stop all init scripts in /etc/init.d
 # executing them in reversed numerical order.
