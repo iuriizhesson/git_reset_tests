@@ -21,6 +21,10 @@ ifeq ($(BR2_PACKAGE_DROPBEAR_CLIENT),y)
 # Build dbclient, and create a convenience symlink named ssh
 DROPBEAR_PROGRAMS += dbclient
 DROPBEAR_TARGET_BINS += dbclient ssh
+define DROPBEAR_HELPERS_SCRIPTS_INSTALL
+	$(INSTALL) -m 755 package/dropbear/dbclient-noask $(TARGET_DIR)/usr/bin/dbclient-noask
+	$(INSTALL) -m 755 package/dropbear/scp-noask $(TARGET_DIR)/usr/bin/scp-noask
+endef
 endif
 
 DROPBEAR_MAKE = \
@@ -130,6 +134,7 @@ define DROPBEAR_INSTALL_TARGET_CMDS
 		ln -snf ../sbin/dropbear $(TARGET_DIR)/usr/bin/$$f ; \
 	done
 	ln -snf /var/run/dropbear $(TARGET_DIR)/etc/dropbear
+	$(DROPBEAR_HELPERS_SCRIPTS_INSTALL)
 endef
 
 $(eval $(autotools-package))

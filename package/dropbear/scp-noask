@@ -1,0 +1,2 @@
+#!/bin/sh
+/usr/bin/scp -S /usr/bin/dbclient-noask "$@"
