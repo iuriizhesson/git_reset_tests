@@ -56,14 +56,8 @@ else
 SWUPDATE_MAKE_ENV += HAVE_LUA=n
 endif
 
-ifeq ($(BR2_PACKAGE_MTD),y)
-SWUPDATE_DEPENDENCIES += mtd
-SWUPDATE_MAKE_ENV += HAVE_LIBMTD=y
-SWUPDATE_MAKE_ENV += HAVE_LIBUBI=y
-else
 SWUPDATE_MAKE_ENV += HAVE_LIBMTD=n
 SWUPDATE_MAKE_ENV += HAVE_LIBUBI=n
-endif
 
 ifeq ($(BR2_PACKAGE_OPENSSL),y)
 SWUPDATE_DEPENDENCIES += openssl
@@ -133,6 +127,12 @@ define SWUPDATE_INSTALL_TARGET_CMDS
 		mkdir -p $(TARGET_DIR)/var/www/swupdate; \
 		cp -dpfr $(@D)/examples/www/v2/* $(TARGET_DIR)/var/www/swupdate)
 endef
+
+ifeq ($(BR2_PACKAGE_SWUPDATE_INITD_SCRIPT),y)
+define SWUPDATE_INSTALL_INIT_SYSV
+	$(INSTALL) -D -m 0755 package/swupdate/S00update $(TARGET_DIR)/etc/init.d/S00update
+endef
+endif
 
 # Checks to give errors that the user can understand
 # Must be before we call to kconfig-package

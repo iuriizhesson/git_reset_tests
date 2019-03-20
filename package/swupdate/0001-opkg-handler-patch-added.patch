@@ -1,0 +1,120 @@
+From 677a76e4bee1b61b9a7b8663581dd1acd9b0a45e Mon Sep 17 00:00:00 2001
+Message-Id: <677a76e4bee1b61b9a7b8663581dd1acd9b0a45e.1553102296.git.yzhesson@iotecha.com>
+From: Yury Zhesson <yzhesson@iotecha.com>
+Date: Wed, 20 Mar 2019 20:18:04 +0300
+Subject: [PATCH] opkg handler patch added
+
+---
+ handlers/Config.in      |  6 +++++
+ handlers/Makefile       |  1 +
+ handlers/opkg_handler.c | 70 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 77 insertions(+)
+
+diff --git a/handlers/Config.in b/handlers/Config.in
+index 12a50b4..1129c2a 100644
+--- a/handlers/Config.in
++++ b/handlers/Config.in
+@@ -99,6 +99,12 @@ config RAW
+ 	  This is a simple handler that simply copies
+ 	  into the destination.
+ 
++config OPKG
++        bool "opkg"
++        default n
++        help
++          Installs opkg packages
++
+ config LUASCRIPTHANDLER
+ 	bool "Lua Script"
+ 	depends on LUA
+diff --git a/handlers/Makefile b/handlers/Makefile
+index 8db9e41..4623443 100644
+--- a/handlers/Makefile
++++ b/handlers/Makefile
+@@ -14,6 +14,7 @@ obj-$(CONFIG_CFI)	+= flash_handler.o
+ obj-$(CONFIG_CFIHAMMING1)+= flash_hamming1_handler.o
+ obj-$(CONFIG_LUASCRIPTHANDLER) += lua_scripthandler.o
+ obj-$(CONFIG_RAW)	+= raw_handler.o
++obj-$(CONFIG_OPKG) += opkg_handler.o
+ obj-$(CONFIG_REMOTE_HANDLER) += remote_handler.o
+ obj-$(CONFIG_SHELLSCRIPTHANDLER) += shell_scripthandler.o
+ obj-$(CONFIG_SWUFORWARDER_HANDLER) += swuforward_handler.o
+diff --git a/handlers/opkg_handler.c b/handlers/opkg_handler.c
+new file mode 100644
+index 0000000..fa9ead1
+--- /dev/null
++++ b/handlers/opkg_handler.c
+@@ -0,0 +1,70 @@
++/*
++ * (C) Copyright 2013
++ * Stefano Babic, DENX Software Engineering, sbabic@denx.de.
++ * 	on behalf of ifm electronic GmbH
++ *
++ * SPDX-License-Identifier:     GPL-2.0-or-later
++ */
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++#include <fcntl.h>
++#include <stdlib.h>
++#include <errno.h>
++
++#include "swupdate.h"
++#include "handler.h"
++#include "util.h"
++
++void opkg_handler(void);
++
++static int install_opkg_package(struct img_type *img,
++	void __attribute__ ((__unused__)) *data)
++{
++        const char opkg_command[] = "opkg install --force-reinstall";
++        char opkg_install_cmd[sizeof(opkg_command) + MAX_IMAGE_FNAME];
++	char opkg_tmp_path[MAX_IMAGE_FNAME];
++	int fdout;
++	int ret = 0;
++	
++        if (snprintf(opkg_tmp_path, sizeof(opkg_tmp_path), "%s%s", get_tmpdir(), img->fname) >= (int)sizeof(opkg_tmp_path)) {
++                ERROR("OPKG tmp path too long: %s", img->fname);
++                return -1;
++        }
++        
++        if (snprintf(opkg_install_cmd, sizeof(opkg_install_cmd), "%s '%s'", opkg_command, opkg_tmp_path) >= (int)sizeof(opkg_install_cmd)) {
++                ERROR("OPKG install command too long");
++                return -1;
++        }
++        
++	TRACE("Installing opkg package %s from temporary file %s\n",
++		img->fname, opkg_tmp_path);
++	fdout = openfileoutput(opkg_tmp_path);
++	ret = copyimage(&fdout, img, NULL);
++	if (ret< 0) {
++		ERROR("Error copying opkg file\n");
++	}
++	close(fdout);
++        
++        if (ret< 0) {
++            return ret;
++        }
++        
++        DEBUG("OPKG install command are going to be called %s", opkg_install_cmd);
++        ret = system(opkg_install_cmd);
++        if (WIFEXITED(ret)) {
++                DEBUG("OPKG install command returned %d", WEXITSTATUS(ret));
++                return ret;
++        } else {
++                ERROR("OPKG install command returned %d: '%s'", ret, strerror(errno));
++                return -1;
++        }
++}
++
++__attribute__((constructor))
++void opkg_handler(void)
++{
++	register_handler("opkg", install_opkg_package,
++				FILE_HANDLER, NULL);
++}
+-- 
+2.11.0
+

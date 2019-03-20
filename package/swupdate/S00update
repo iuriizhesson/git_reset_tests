@@ -1,0 +1,111 @@
+#!/bin/sh
+UPDATES=/var/updates
+APPLIED_UPDATES=$UPDATES/applied
+FAILED_UPDATES=$UPDATES/failed
+PUBLIC_FILENAME=signature.key
+AES_FILENAME=symmetric.key
+STPIMAGEVALIDATE_PATH=/usr/bin/stpimagevalidate
+
+get_gpio()
+{
+    # TODO: Add mapping for ARK_GPIO
+
+    local _mfio_gpio="$1"
+    local _reset_gpio=$2
+
+    if [ "$_mfio_gpio" -lt 88 ] || [ "$_mfio_gpio" -gt 103 ]; then
+        echo "Error. Can't convert mfio gpio number $_mfio_gpio to gpio."
+        echo "/proc/mfr-params/target.gpioreset have to be in range from 88 to 103"
+        return 1
+    fi
+
+    local _gpio=$(($_mfio_gpio - 64))
+    eval $_reset_gpio="'$_gpio'"
+}
+
+check_dir() {
+    if [ ! -d $UPDATES ]; then
+        mkdir -p $UPDATES
+    fi
+    local PERMISSIONS=$(ls -l $(dirname "${UPDATES}") | grep $(basename "${UPDATES}") | cut -c 2-10)
+    if [ "${PERMISSIONS}" != "rwxrwxrwx" ]; then
+        chmod 777 $UPDATES
+    fi
+}
+
+try_update() {
+    local NEED_REBOOT=0
+    for UPDATE_DIRECTORY in "${UPDATES}"/*; do
+        if [[ ! -d "${UPDATE_DIRECTORY}" || "${UPDATE_DIRECTORY}" == "${FAILED_UPDATES}" || "${UPDATE_DIRECTORY}" == "${APPLIED_UPDATES}" ]]; then
+                echo "Skipping wrong directory: ${UPDATE_DIRECTORY}"
+                continue
+        fi
+        if [[ ! -f "${UPDATE_DIRECTORY}/${PUBLIC_FILENAME}" || ! -f "${UPDATE_DIRECTORY}/${AES_FILENAME}" ]]; then
+                echo "Skipping directory without keys: ${UPDATE_DIRECTORY}"
+                continue
+        fi
+        for UPDATE_FILE in "$UPDATE_DIRECTORY"/*.swu; do
+                if [[ ! -f "${UPDATE_FILE}" ]]; then
+                        echo "Skipping not existing file: ${UPDATE_FILE}"
+                        continue
+                fi
+                local NAME=$(basename "${UPDATE_FILE}")
+                echo "Applying $NAME..."
+                swupdate -i "${UPDATE_FILE}" -k "${UPDATE_DIRECTORY}/${PUBLIC_FILENAME}" -K "${UPDATE_DIRECTORY}/${AES_FILENAME}" > "${UPDATE_DIRECTORY}/update.log"
+                if [ $? -eq 0 ]; then
+                    echo "${NAME}: OK"
+                    mkdir -p $APPLIED_UPDATES
+                    #mv -f "${UPDATE_DIRECTORY}" "${APPLIED_UPDATES}/${NAME}_$(date +%s)"
+                    cp -Rf "${UPDATE_DIRECTORY}" "${APPLIED_UPDATES}/${NAME}_$(date +%s)"
+                    rm -Rf "${UPDATE_DIRECTORY}"
+                else
+                    echo "${NAME}: FAILED"
+                    mkdir -p $FAILED_UPDATES
+                    #mv -f "${UPDATE_DIRECTORY}" "${FAILED_UPDATES}/${NAME}_$(date +%s)"
+                    cp -Rf "${UPDATE_DIRECTORY}" "${FAILED_UPDATES}/${NAME}_$(date +%s)"
+                    rm -Rf "${UPDATE_DIRECTORY}"
+                fi
+                NEED_REBOOT=1
+        done
+    done
+    if [ $NEED_REBOOT -eq 1 ]; then
+
+        if [ -x "${STPIMAGEVALIDATE_PATH}" ]; then
+            echo "Found stpimagevalidate utility, validating image..."
+            "${STPIMAGEVALIDATE_PATH}" -v -s
+        else
+            echo "No stpimagevalidate utility found, skipping image validation"
+        fi
+
+        sync
+        echo "Reboot..."
+
+        mfgpio=$(printf '%d' "'$(cat /proc/mfr-params/target.gpioreset )")
+        get_gpio "$mfgpio" reset_gpio_num
+        if [ -z "$reset_gpio_num" ]; then
+            echo "Error: Can't get reset gpio number!"
+            return 1
+        fi
+
+        echo "$reset_gpio_num" > /sys/class/gpio/export
+        echo low > /sys/class/gpio/gpio"$reset_gpio_num"/direction
+    fi
+}
+
+case "$1" in
+    start)
+        echo "Checking updates... "
+        check_dir
+        try_update
+        ;;
+    stop)
+        ;;
+    restart)
+        $0 stop
+        sleep 1
+        $0 start
+        ;;
+    *)
+        echo "usage: $0 {start|stop|restart}"
+        ;;
+esac
