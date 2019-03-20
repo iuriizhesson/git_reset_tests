@@ -1,0 +1,7 @@
+config BR2_PACKAGE_MICROSOFT_BOND
+	bool "microsoft-bond"
+	select BR2_PACKAGE_BOOST_THREAD
+	select BR2_PACKAGE_RAPIDJSON
+	select BR2_PACKAGE_HOST_PATCHELF
+	help
+	  https://github.com/Microsoft/bond

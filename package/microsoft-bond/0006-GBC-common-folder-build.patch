@@ -1,0 +1,45 @@
+From b2c3a02aa2208cd7deea0f5fa441e4a887ab124e Mon Sep 17 00:00:00 2001
+Message-Id: <b2c3a02aa2208cd7deea0f5fa441e4a887ab124e.1535190089.git.sergrak@klika-tech.com>
+From: Sergey Rak <sergrak@klika-tech.com>
+Date: Sat, 25 Aug 2018 12:41:23 +0300
+Subject: [PATCH] GBC common folder build
+
+Sync gbc compiler sources, build them in stack folder - avoiding
+redownloading and rebuilding. May cause issues on multiparallel build.
+But saves around 5 min of build time
+---
+ compiler/CMakeLists.txt | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/compiler/CMakeLists.txt b/compiler/CMakeLists.txt
+index 117016f6..2605f935 100644
+--- a/compiler/CMakeLists.txt
++++ b/compiler/CMakeLists.txt
+@@ -51,6 +51,13 @@ function (add_stack_build target)
+     list (APPEND options $<$<CONFIG:RelWithDebInfo>:--no-library-stripping>)
+     list (APPEND options $<$<CONFIG:RelWithDebInfo>:--no-strip>)
+ 
++    get_filename_component(stackAbsPath "~/.stack" REALPATH )
++    message("STACK PATH: ${stackAbsPath}")
++    
++    execute_process(
++    COMMAND find ./ -type f -exec install -CD {} ${stackAbsPath}/gbc/{} \;
++    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} )
++ 
+     add_custom_command (
+         DEPENDS ${arg_SOURCES}
+         COMMAND ${CMAKE_COMMAND}
+@@ -59,8 +66,8 @@ function (add_stack_build target)
+             -Dbuild_dir=${CMAKE_CURRENT_BINARY_DIR}
+             -Dtarget=${target}
+             "\"-Dstack_options=${options}\""
+-            -P stack_build.cmake
+-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
++            -P ${stackAbsPath}/gbc/stack_build.cmake
++        WORKING_DIRECTORY ${stackAbsPath}/gbc/
+         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/build/${target}/${target}${CMAKE_EXECUTABLE_SUFFIX})
+     add_custom_target (${target}
+         SOURCES ${arg_SOURCES}
+-- 
+2.11.0
+

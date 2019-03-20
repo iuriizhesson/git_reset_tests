@@ -1,0 +1,16 @@
+diff --git a/cpp/inc/bond/protocol/encoding.h b/cpp/inc/bond/protocol/encoding.h
+index 813204a7..c79c0d93 100644
+--- a/cpp/inc/bond/protocol/encoding.h
++++ b/cpp/inc/bond/protocol/encoding.h
+@@ -145,6 +145,11 @@ inline char HexDigit(int n)
+     return d < 10 ? ('0' + d) : ('a' + d - 10);
+ }
+ 
++inline char HexDigit(unsigned n)
++{
++    return HexDigit((int)n);
++}
++
+ inline int HexDigit(char c)
+ {
+     if (c >= 'a' && c <= 'f')

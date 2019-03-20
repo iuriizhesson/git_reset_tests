@@ -1,0 +1,12 @@
+diff --git a/compiler/src/Language/Bond/Codegen/Cpp/Types_h.hs b/compiler/src/Language/Bond/Codegen/Cpp/Types_h.hs
+index 382cce8b..8a8ec59d 100644
+--- a/compiler/src/Language/Bond/Codegen/Cpp/Types_h.hs
++++ b/compiler/src/Language/Bond/Codegen/Cpp/Types_h.hs
+@@ -122,6 +122,7 @@ namespace std
+         #{moveCtor}
+         #{optional allocatorCtor allocator}
+         #{assignmentOp}
++        virtual ~#{declName}() = default;
+ 
+         bool operator==(const #{declName}&#{otherParam}) const
+         {

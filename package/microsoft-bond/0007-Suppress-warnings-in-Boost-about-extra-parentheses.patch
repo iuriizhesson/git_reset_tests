@@ -1,0 +1,25 @@
+From 2771ce4956c3494fbe8e87469f5ac2061864a25b Mon Sep 17 00:00:00 2001
+From: Maksim Salau <msalau@klika-tech.com>
+Date: Thu, 18 Oct 2018 13:30:55 +0300
+Subject: [PATCH] Suppress warnings in Boost about extra parentheses
+
+---
+ cmake/Config.cmake | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/cmake/Config.cmake b/cmake/Config.cmake
+index bdb17b4f2c9a..d24eed622ffc 100644
+--- a/cmake/Config.cmake
++++ b/cmake/Config.cmake
+@@ -173,6 +173,8 @@ cxx_add_compile_options(GNU
+     --std=c++11
+     -Wall
+     -Werror
++    # Suppress warnings in Boost about extra parentheses
++    -Wno-parentheses
+     # Suppress warnings in Boost about using deprecated types like std::auto_ptr
+     -Wno-deprecated-declarations
+     -Wno-unused-local-typedefs)
+-- 
+2.19.1
+

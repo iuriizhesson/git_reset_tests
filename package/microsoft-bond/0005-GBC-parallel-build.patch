@@ -1,0 +1,43 @@
+From 4ffcb60b2c44829624f7709dbac20d66241465c4 Mon Sep 17 00:00:00 2001
+Message-Id: <4ffcb60b2c44829624f7709dbac20d66241465c4.1535128247.git.sergrak@klika-tech.com>
+From: Sergey Rak <sergrak@klika-tech.com>
+Date: Fri, 24 Aug 2018 19:29:27 +0300
+Subject: [PATCH] GBC parallel build
+
+---
+ compiler/CMakeLists.txt | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/compiler/CMakeLists.txt b/compiler/CMakeLists.txt
+index 8d9a5153..117016f6 100644
+--- a/compiler/CMakeLists.txt
++++ b/compiler/CMakeLists.txt
+@@ -9,6 +9,15 @@ include (Folders)
+ find_package (Stack)
+ 
+ function (add_stack_build target)
++
++    include(ProcessorCount)
++    ProcessorCount(N)
++    if(NOT N EQUAL 0)
++        set(NPROC ${N})
++    else()
++        set(NPROC "1")
++    endif()
++
+     set (flagArgs ENABLE_TESTS)
+     set (multiValueArgs SOURCES DEPENDS)
+     cmake_parse_arguments (arg "${flagArgs}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+@@ -19,6 +28,9 @@ function (add_stack_build target)
+ 
+     # If unspecified, turn off optimizations
+     list (APPEND options $<$<CONFIG:>:--fast>)
++    #Always add multithread build
++    list (APPEND options "-j${NPROC}")
++    list (APPEND options "--ghc-options=-j${NPROC}")
+ 
+     list (APPEND options $<$<CONFIG:Debug>:--fast>)
+     list (APPEND options $<$<CONFIG:Debug>:--no-executable-stripping>)
+-- 
+2.11.0
+

@@ -1,0 +1,26 @@
+From abc3e73bef39efc93626ed9916ae45106b627f05 Mon Sep 17 00:00:00 2001
+Message-Id: <abc3e73bef39efc93626ed9916ae45106b627f05.1530885621.git.sergrak@klika-tech.com>
+From: Sergey Rak <sergrak@klika-tech.com>
+Date: Fri, 6 Jul 2018 17:00:16 +0300
+Subject: [PATCH] fix: executable permissions
+
+---
+ compiler/CMakeLists.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/compiler/CMakeLists.txt b/compiler/CMakeLists.txt
+index 8d9a5153..76f44bfb 100644
+--- a/compiler/CMakeLists.txt
++++ b/compiler/CMakeLists.txt
+@@ -126,6 +126,8 @@ endif()
+ 
+ install (FILES ${output}
+     PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE
++    OWNER_READ GROUP_READ WORLD_READ
++    OWNER_WRITE
+     DESTINATION bin)
+ 
+ install (FILES ${completion}
+-- 
+2.11.0
+

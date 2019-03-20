@@ -1,0 +1,43 @@
+From 5b1271b7919aafcd93b841fd3a39cf7dc8268229 Mon Sep 17 00:00:00 2001
+Message-Id: <5b1271b7919aafcd93b841fd3a39cf7dc8268229.1530884524.git.sergrak@klika-tech.com>
+From: Sergey Rak <sergrak@klika-tech.com>
+Date: Fri, 6 Jul 2018 16:41:43 +0300
+Subject: [PATCH] fix: installing and cmake find_package
+
+---
+ CMakeLists.txt          | 4 +++-
+ compiler/CMakeLists.txt | 2 +-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f2f8eaa5..0108d772 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -60,8 +60,10 @@ install (DIRECTORY
+     PATTERN *.cpp EXCLUDE)
+ 
+ install (EXPORT bond
+-    DESTINATION lib/bond
++    DESTINATION share/bond/cmake
++    FILE bond-config.cmake
+     EXPORT_LINK_INTERFACE_LIBRARIES)
++    
+ 
+ if (NOT BOND_FIND_RAPIDJSON)
+     install (DIRECTORY
+diff --git a/compiler/CMakeLists.txt b/compiler/CMakeLists.txt
+index 8d9a5153..d5ee3f3f 100644
+--- a/compiler/CMakeLists.txt
++++ b/compiler/CMakeLists.txt
+@@ -104,7 +104,7 @@ set (test_sources
+     tests/TestMain.hs
+     ${tests})
+ 
+-set (completion_dir etc/bash_completion.d)
++set (completion_dir ${CMAKE_INSTALL_PREFIX}/etc/bash_completion.d)
+ set (completion ${CMAKE_CURRENT_BINARY_DIR}/gbc.comp)
+ set (output ${CMAKE_CURRENT_BINARY_DIR}/build/gbc/gbc${CMAKE_EXECUTABLE_SUFFIX})
+ set (GBC_EXECUTABLE ${output} PARENT_SCOPE)
+-- 
+2.11.0
+
