@@ -46,8 +46,8 @@ HOST_MTD_CONF_OPTS = \
 	--with-ubifs \
 	--disable-tests
 
-MKFS_JFFS2 = $(HOST_DIR)/sbin/mkfs.jffs2
-SUMTOOL = $(HOST_DIR)/sbin/sumtool
+MKFS_JFFS2 = $(HOST_DIR)/usr/sbin/mkfs.jffs2
+SUMTOOL = $(HOST_DIR)/usr/sbin/sumtool
 
 MTD_TARGETS_$(BR2_PACKAGE_MTD_DOCFDISK)		+= docfdisk
 MTD_TARGETS_$(BR2_PACKAGE_MTD_DOC_LOADBIOS)	+= doc_loadbios
