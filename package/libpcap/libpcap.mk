@@ -16,6 +16,8 @@ LIBPCAP_CONF_ENV = \
 	CFLAGS="$(LIBPCAP_CFLAGS)"
 LIBPCAP_CFLAGS = $(TARGET_CFLAGS)
 LIBPCAP_CONF_OPTS = --disable-yydebug --with-pcap=linux --without-dag
+# 2018-10-29 amarkelov: this allows us to open CAN interfaces in SLL mode, see 0002-cooked-mode-only.patch
+LIBPCAP_CONF_OPTS += --disable-can
 LIBPCAP_CONFIG_SCRIPTS = pcap-config
 
 # Omit -rpath from pcap-config output

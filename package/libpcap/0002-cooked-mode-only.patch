@@ -1,0 +1,28 @@
+From 9c43d64059a0a23971c6ccae61158f471fff1496 Mon Sep 17 00:00:00 2001
+Message-Id: <9c43d64059a0a23971c6ccae61158f471fff1496.1553071974.git.yzhesson@iotecha.com>
+From: Yury Zhesson <yzhesson@iotecha.com>
+Date: Wed, 20 Mar 2019 11:52:27 +0300
+Subject: [PATCH] libpcap package fixes: SWDEV-584
+
+Added cooked mode only patch. Disabled CAN-specific code so we can
+capture packet direction information to be used in netlogger: SWDEV-568
+---
+ pcap-linux.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pcap-linux.c b/pcap-linux.c
+index 49144b6..2877be5 100644
+--- a/pcap-linux.c
++++ b/pcap-linux.c
+@@ -3687,7 +3687,7 @@ activate_new(pcap_t *handle)
+ 			return arptype;
+ 		}
+ 		map_arphrd_to_dlt(handle, sock_fd, arptype, device, 1);
+-		if (handle->linktype == -1 ||
++		if (1 || handle->linktype == -1 ||
+ 		    handle->linktype == DLT_LINUX_SLL ||
+ 		    handle->linktype == DLT_LINUX_IRDA ||
+ 		    handle->linktype == DLT_LINUX_LAPD ||
+-- 
+2.11.0
+
