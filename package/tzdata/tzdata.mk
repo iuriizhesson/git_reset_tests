@@ -41,6 +41,7 @@ define TZDATA_INSTALL_TARGET_CMDS
 			"$(TZDATA_LOCALTIME)"; \
 		exit 1; \
 	fi
+	mkdir -p $(TARGET_DIR)/etc
 	ln -sf ../usr/share/zoneinfo/$(TZDATA_LOCALTIME) $(TARGET_DIR)/etc/localtime
 	echo "$(TZDATA_LOCALTIME)" >$(TARGET_DIR)/etc/timezone
 endef
